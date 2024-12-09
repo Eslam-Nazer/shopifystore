@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Traits\HttpResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserLoginRequest;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\UserRegisterReguest;
 
 class UserAuthController extends Controller
 {
@@ -36,50 +35,24 @@ class UserAuthController extends Controller
         ], null, 200);
     }
 
-    public function sginup()
-    {
-        return response(json_encode(["resgister" => 'RegisterView']));
-    }
-
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return JsonResponse|mixed
+     * Summary of register
+     * @param \App\Http\Requests\UserRegisterReguest $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request): JsonResponse
+    public function register(UserRegisterReguest $request): JsonResponse
     {
-        try {
-            $validateUser = Validator::make($request->all(), [
-                'username'      => ['required', 'string', 'unique:users,name'],
-                'email'         => ['required', 'string', 'email', 'unique:users,email'],
-                'password'      => [
-                    'required',
-                    'string',
-                    'min:8',
-                    'confirmed:confirmPassword'
-                ],
-            ]);
+        $request->validated();
 
-            if ($validateUser->fails()) {
-                return response()->json(
-                    ['errors'   => $validateUser->errors()],
-                    http_response_code(401)
-                );
-            }
+        $user = User::create([
+            "name"  => $request->name,
+            "email"     => $request->email,
+            "password"  => Hash::make($request->password)
+        ]);
 
-            $user = User::create([
-                "name"  => $request->username,
-                "email"     => $request->email,
-                "password"  => Hash::make($request->password)
-            ]);
-
-            return response()->json([
-                'message'       => "User created successfully please check your email",
-                'token'         => $user->createToken("Token")->plainTextToken
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "error" => $th->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'message'       => "User created successfully please check your email",
+            'token'         => $user->createToken("Token")->plainTextToken
+        ]);
     }
 }

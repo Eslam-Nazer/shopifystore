@@ -9,9 +9,5 @@ use App\Http\Controllers\Api\UserAuthController;
 // })->middleware('auth:sanctum');
 
 // Public routes
-Route::post("/login", [UserAuthController::class, "login"]);
-
-/* Register users */
-
-Route::get(uri: '/signup', action: [UserAuthController::class, 'sginup'])->name('signup');
-Route::post(uri: '/signup', action: [UserAuthController::class, 'register'])->name('register');
+Route::post("/login", [UserAuthController::class, "login"])->name('login');
+Route::post(uri: '/register', action: [UserAuthController::class, 'register'])->name('register');
