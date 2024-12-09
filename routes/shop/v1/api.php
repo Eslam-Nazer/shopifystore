@@ -4,14 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserAuthController;
 
-/* login users */
-
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get(uri: '/login', action: [UserAuthController::class, 'login'])->name('login');
-Route::post(uri: '/login', action: [UserAuthController::class, 'authenticate']);
+// Public routes
+Route::post("/login", [UserAuthController::class, "login"]);
 
 /* Register users */
 

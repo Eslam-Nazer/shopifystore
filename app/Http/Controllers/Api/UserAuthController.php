@@ -3,55 +3,37 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Traits\HttpResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UserLoginRequest;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class UserAuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        return $request->all();
-    }
+    use HttpResponse;
 
     /**
-     * Summary of authenticate
-     * @param \Illuminate\Http\Request $request
+     * Summary of login
+     * @param \App\Http\Requests\UserLoginRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function authenticate(Request $request): JsonResponse
+    public function login(UserLoginRequest $request): JsonResponse
     {
-        try {
-            $credentials = $request->validate(rules: [
-                'email'         => ['required', 'email'],
-                'password'      => ['required'],
-            ]);
-
-            $user = User::where('email', $request->email)->first();
-
-            if (! $user || ! Hash::check($request->password, $user->password)) {
-                throw ValidationException::withMessages([
-                    'email'     => ['The provided credentials are incorrect.']
-                ]);
-            }
-
-            if (Auth::attempt($credentials)) {
-                return response()->json(data: [
-                    'user'  => Auth::user(),
-                    'token' => $user->createToken("API Token")->plainTextToken,
-                ]);
-            }
-        } catch (\Throwable $th) {
-            return response()->json([
-                'errors'        => [
-                    $th->getMessage()
-                ]
-            ]);
+        $credentials = $request->validated();
+        if (! Auth::attempt(credentials: $credentials)) {
+            return $this->errorResponse('', null, 501);
         }
+
+        $user = User::where(['email' => $request->email])->first();
+
+        return $this->successResponse([
+            'user'      => $user,
+            'token'     => $user->createToken("Api Token {$user->name}")->plainTextToken,
+        ], null, 200);
     }
 
     public function sginup()
@@ -60,7 +42,6 @@ class UserAuthController extends Controller
     }
 
     /**
-     * s
      * @param \Illuminate\Http\Request $request
      * @return JsonResponse|mixed
      */
