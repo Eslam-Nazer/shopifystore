@@ -19,7 +19,11 @@ trait HttpResponse
             'data'      => $data,
             'message'   => $message,
             'status'    => "Request was Successful."
-        ], $code);
+        ], $code)
+            ->withHeaders([
+                'Accept'        => 'application/vnd.api+json',
+                'Content-Type'  => 'application/vnd.api+json'
+            ]);
     }
 
     /**
@@ -35,6 +39,10 @@ trait HttpResponse
             "data"      => $data,
             "message"   => $message,
             "status"    => "Error has occurred... "
-        ], $code);
+        ], $code)
+            ->withHeaders([
+                'Accept'        => 'application/vnd.api+json',
+                'Content-Type'  => 'application/vnd.api+json'
+            ]);
     }
 }
