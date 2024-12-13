@@ -11,3 +11,8 @@ use App\Http\Controllers\Api\UserAuthController;
 // Public routes
 Route::post("/login", [UserAuthController::class, "login"])->name('login');
 Route::post(uri: '/register', action: [UserAuthController::class, 'register'])->name('register');
+
+// Protected routes
+Route::group(['middleware' => "auth:sanctum"], function () {
+    Route::post("/logout", [UserAuthController::class, "logout"])->name('logout');
+});
