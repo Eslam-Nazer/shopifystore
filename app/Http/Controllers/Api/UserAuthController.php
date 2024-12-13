@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterReguest;
+use Illuminate\Http\Request;
 
 class UserAuthController extends Controller
 {
@@ -54,5 +55,20 @@ class UserAuthController extends Controller
             'message'       => "User created successfully please check your email",
             'token'         => $user->createToken("Token")->plainTextToken
         ]);
+    }
+
+    /**
+     * Summary of logout
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->successResponse(
+            $request->user(),
+            [
+                'message'       => 'User logout successful'
+            ]
+        );
     }
 }
